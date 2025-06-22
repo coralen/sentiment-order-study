@@ -1,0 +1,20 @@
+artifact_path: file:///C:/Projects/sentiment-lstm-vs-transformer/mlruns/687717501371724008/models/m-041295d1c8cd407ba0c5c1dbef777001/artifacts
+flavors:
+  keras:
+    data: data
+    keras_backend: tensorflow
+    keras_version: 3.10.0
+    save_exported_model: false
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.keras
+    python_version: 3.12.3
+mlflow_version: 3.1.0
+model_id: m-041295d1c8cd407ba0c5c1dbef777001
+model_size_bytes: 9290493
+model_uuid: m-041295d1c8cd407ba0c5c1dbef777001
+prompts: null
+run_id: 7a44759b3cd447059fc1563d9bd8ea5b
+utc_time_created: '2025-06-22 09:33:21.600845'
