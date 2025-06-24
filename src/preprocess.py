@@ -1,49 +1,98 @@
-from sklearn.model_selection import train_test_split
-import pandas as pd
 import os
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+
+from tensorflow.keras.preprocessing.text import Tokenizer # type: ignore
+from tensorflow.keras.preprocessing.sequence import pad_sequences # type: ignore
+from torch.utils.data import DataLoader, TensorDataset
+from transformers import BertTokenizerFast
+from sklearn.model_selection import train_test_split
+import torch
+import pandas as pd
+import numpy as np
 import spacy
 
-class Preprocess:
-    def __init__(self, file_path=None, test_size: float=0.2, batch_size=256):
-        self.train_data = None
-        self.test_data = None
-        self.file_path = file_path
-        self.test_size = test_size
-        self.batch_size = batch_size
-        self.nlp = spacy.load("en_core_web_sm", disable=["parser", "ner"])
-        
-    def load_and_split(self):
-        if self.file_path is None:
-            self.file_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'IMDB_Dataset_sample.csv')
-            self.file_path = os.path.abspath(self.file_path)
-        
-        try:
-            imdb_df = pd.read_csv(self.file_path)
-            imdb_df['label'] = imdb_df['sentiment'].map({'positive': 1, 'negative': 0})
-            self.train_data, self.test_data = train_test_split(imdb_df, test_size=0.2, random_state=42)
-        except Exception as e:
-            raise
+from config import TEST_SIZE, RANDOM_STATE
 
-    def extract_features(self, docs):
-        tokens = []
-        lemmas = []
-        pos_tags = []
-        for doc in docs:
-            tokens.append([t.text for t in doc if t.is_alpha])
-            lemmas.append([t.lemma_ for t in doc if t.is_alpha])
-            pos_tags.append([t.pos_ for t in doc if t.is_alpha])
-        return tokens, lemmas, pos_tags
-
-    def nlp_pipeline(self, data, type):
-        data_docs = self.nlp.pipe(data["review"], batch_size=self.batch_size, n_process=1)
-        data["tokens"], data["lemmas"], data["pos"] = self.extract_features(data_docs)
-        if type=="train": 
-            self.train_data = data
-        else: 
-            self.test_data = data
     
-    def process(self):
-        self.load_and_split()
-        self.nlp_pipeline(self.train_data, type="train")
-        self.nlp_pipeline(self.test_data, type="test")
-        return self.train_data, self.test_data
+def load_and_split(file_path):
+    try:
+        imdb_df = pd.read_csv(file_path)
+        imdb_df['label'] = imdb_df['sentiment'].map({'positive': 1, 'negative': 0})
+        return train_test_split(imdb_df, test_size=TEST_SIZE, random_state=RANDOM_STATE)
+    except Exception as e:
+        raise
+
+def extract_features(docs):
+    tokens = []
+    lemmas = []
+    pos_tags = []
+    for doc in docs:
+        tokens.append([t.text for t in doc if t.is_alpha])
+        lemmas.append([t.lemma_ for t in doc if t.is_alpha])
+        pos_tags.append([t.pos_ for t in doc if t.is_alpha])
+    return tokens, lemmas, pos_tags
+
+def nlp_pipeline(data):
+    nlp = spacy.load("en_core_web_sm", disable=["parser", "ner"])
+    data_docs = nlp.pipe(data["review"])
+    data["tokens"], data["lemmas"], data["pos"] = extract_features(data_docs)
+    return data
+
+def process(file_path):
+    train_data, test_data = load_and_split(file_path)
+    train_data = nlp_pipeline(train_data)
+    test_data = nlp_pipeline(test_data)
+    return train_data, test_data
+
+def tinybert_tokenizer(tokenizer,texts, max_len):
+    return tokenizer.batch_encode_plus(
+            texts.tolist(),
+            add_special_tokens=True,
+            padding='max_length',
+            truncation=True,
+            max_length=max_len,
+            return_tensors='pt'
+        )
+def prepare_data_tinybert(train_texts, train_labels, test_texts, config):
+    '''Accept raw data since TinyBERT works better with it.'''
+    tokenizer = BertTokenizerFast.from_pretrained("huawei-noah/TinyBERT_General_4L_312D")
+    X_train, X_val, y_train, y_val = train_test_split(train_texts, train_labels, test_size=TEST_SIZE, 
+                                                      random_state=RANDOM_STATE)
+
+    train_tokens = tinybert_tokenizer(tokenizer, X_train['review'], config.max_len)
+    val_tokens = tinybert_tokenizer(tokenizer, X_val['review'], config.max_len)
+    test_tokens = tinybert_tokenizer(tokenizer, test_texts['review'], config.max_len)
+
+    train_dataset = TensorDataset(train_tokens['input_ids'], train_tokens['attention_mask'], 
+                                    torch.tensor(y_train.tolist()))
+    val_dataset = TensorDataset(val_tokens['input_ids'], val_tokens['attention_mask'], 
+                                torch.tensor(y_val.tolist()))
+    test_dataset = TensorDataset(test_tokens['input_ids'], test_tokens['attention_mask'], 
+                                    torch.tensor(test_texts['label'].tolist()))
+
+    train_loader = DataLoader(train_dataset, batch_size=config.batch_size)
+    val_loader = DataLoader(val_dataset, batch_size=config.batch_size)
+    test_loader = DataLoader(test_dataset, batch_size=config.batch_size)
+
+    return train_loader, val_loader, test_loader
+
+def prepare_data_lstm(train_texts, test_texts, w2v_model, max_len):
+    '''Accept lemmas since LSTM works better with it.'''
+    tokenizer = Tokenizer()
+    tokenizer.fit_on_texts(train_texts)
+    train_sequences = tokenizer.texts_to_sequences(train_texts)
+    test_sequences = tokenizer.texts_to_sequences(test_texts)
+
+    # Pad sequences
+    train_padded = pad_sequences(train_sequences, maxlen=max_len, padding='post')
+    test_padded = pad_sequences(test_sequences, maxlen=max_len, padding='post')
+
+    # Create embedding matrix
+    word_index = tokenizer.word_index
+    embedding_dim = w2v_model.vector_size
+    embedding_matrix = np.zeros((len(word_index) + 1, embedding_dim))
+    for word, i in word_index.items():
+        if word in w2v_model.wv:
+            embedding_matrix[i] = w2v_model.wv[word]
+
+    return train_padded, test_padded, embedding_matrix
