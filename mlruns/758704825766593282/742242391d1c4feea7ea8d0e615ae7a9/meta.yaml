@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/Projects/sentiment-lstm-vs-transformer/mlruns/758704825766593282/742242391d1c4feea7ea8d0e615ae7a9/artifacts
+end_time: 1750795459825
+entry_point_name: ''
+experiment_id: '758704825766593282'
+lifecycle_stage: active
+run_id: 742242391d1c4feea7ea8d0e615ae7a9
+run_name: TinyBERT_sentiment_original
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1750785611957
+status: 3
+tags: []
+user_id: Coral Engel

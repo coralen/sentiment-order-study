@@ -1,0 +1,4 @@
+{"timestamp": "20250624_200714", "model_name": "LSTM_sentiment_original", "test_loss": 0.43695443868637085, "test_accuracy": 0.80625, "f1_score": 0.8197255175622238, "confusion_matrix": "[[1463,  585],\n [ 190, 1762]]"}
+{"timestamp": "20250624_201952", "model_name": "LSTM_sentiment_shuffled", "test_loss": 0.6056777834892273, "test_accuracy": 0.727, "f1_score": 0.6355140186915887, "confusion_matrix": "[[1956,   92],\n [1000,  952]]"}
+{"timestamp": "20250624_230419", "model_name": "TinyBERT_sentiment_original", "test_loss": 0.3909735320106385, "test_accuracy": 0.8465, "f1_score": 0.8318729463307777, "confusion_matrix": "[[1867,  181],\n [ 433, 1519]]"}
+{"timestamp": "20250625_021259", "model_name": "TinyBERT_sentiment_shuffled", "test_loss": 0.3678416018448179, "test_accuracy": 0.85025, "f1_score": 0.8443751623798389, "confusion_matrix": "[[1776,  272],\n [ 327, 1625]]"}

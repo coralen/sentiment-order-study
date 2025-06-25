@@ -23,6 +23,7 @@ class LSTMClassifier:
         self.dropout = config.dropout
         self.recurrent_dropout = config.recurrent_dropout
         self.model_name = config.model_name
+        self.experiment_name = config.experiment_name
         self.batch_size = config.batch_size
         self.epochs = config.epochs
         self.validation_split = config.validation_split
@@ -48,7 +49,7 @@ class LSTMClassifier:
         self.build_model(embedding_matrix)
         early_stop = EarlyStopping(monitor='val_loss', patience=self.patience, restore_best_weights=True)
         
-        mlflow.set_experiment("sentiment_experiment_LSTM")
+        mlflow.set_experiment(self.experiment_name)
         with mlflow.start_run(run_name=self.model_name) as run:
             # Log parameters
             mlflow.log_param("lstm_units", self.lstm_units)

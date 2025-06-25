@@ -18,13 +18,14 @@ class TinyBERTClassifier:
         self.model = BertForSequenceClassification.from_pretrained('huawei-noah/TinyBERT_General_4L_312D', 
                                                                    num_labels=2).to(self.device)
         self.model_name = config.model_name
+        self.experiment_name = config.experiment_name
         self.learning_rate = config.learning_rate
         self.epochs = config.epochs
         
     def train(self, train_loader, val_loader):
         optimizer = torch.optim.AdamW(self.model.parameters(), lr=self.learning_rate)
 
-        mlflow.set_experiment("sentiment_experiment_TinyBERT")
+        mlflow.set_experiment(self.experiment_name)
         with mlflow.start_run(run_name=self.model_name) as run:
             mlflow.log_params({
                 "learning_rate": self.learning_rate,

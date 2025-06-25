@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/Projects/sentiment-lstm-vs-transformer/mlruns/399750054745388226/e6352eeb8ce145a99d0612809c477830/artifacts
+end_time: 1750784834461
+entry_point_name: ''
+experiment_id: '399750054745388226'
+lifecycle_stage: active
+run_id: e6352eeb8ce145a99d0612809c477830
+run_name: LSTM_sentiment_original
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1750784180149
+status: 3
+tags: []
+user_id: Coral Engel

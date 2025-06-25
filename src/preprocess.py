@@ -6,9 +6,11 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences # type: ignore
 from torch.utils.data import DataLoader, TensorDataset
 from transformers import BertTokenizerFast
 from sklearn.model_selection import train_test_split
-import torch
+from gensim.models import Word2Vec
+from sklearn.utils import shuffle
 import pandas as pd
 import numpy as np
+import torch
 import spacy
 
 from config import TEST_SIZE, RANDOM_STATE
@@ -32,43 +34,45 @@ def extract_features(docs):
         pos_tags.append([t.pos_ for t in doc if t.is_alpha])
     return tokens, lemmas, pos_tags
 
-def nlp_pipeline(data):
+def nlp_pipeline(df):
     nlp = spacy.load("en_core_web_sm", disable=["parser", "ner"])
-    data_docs = nlp.pipe(data["review"])
-    data["tokens"], data["lemmas"], data["pos"] = extract_features(data_docs)
-    return data
+    data_docs = nlp.pipe(df["review"])
+    df["tokens"], df["lemmas"], df["pos"] = extract_features(data_docs)
+    return df
 
 def process(file_path):
-    train_data, test_data = load_and_split(file_path)
-    train_data = nlp_pipeline(train_data)
-    test_data = nlp_pipeline(test_data)
-    return train_data, test_data
+    '''Process text for tokens, lemmas and pos tags, and create a shuffled train set'''
+    train_df, test_df = load_and_split(file_path)
+    train_df = nlp_pipeline(train_df)
+    test_df = nlp_pipeline(test_df)
+    train_df_shuffled = shuffle(train_df, random_state=RANDOM_STATE)
+    return train_df, train_df_shuffled, test_df
 
-def tinybert_tokenizer(tokenizer,texts, max_len):
+def tinybert_tokenizer(tokenizer, df, max_len):
     return tokenizer.batch_encode_plus(
-            texts.tolist(),
+            df.tolist(),
             add_special_tokens=True,
             padding='max_length',
             truncation=True,
             max_length=max_len,
             return_tensors='pt'
         )
-def prepare_data_tinybert(train_texts, train_labels, test_texts, config):
+def prepare_data_tinybert(train_df, train_labels, test_df, config):
     '''Accept raw data since TinyBERT works better with it.'''
     tokenizer = BertTokenizerFast.from_pretrained("huawei-noah/TinyBERT_General_4L_312D")
-    X_train, X_val, y_train, y_val = train_test_split(train_texts, train_labels, test_size=TEST_SIZE, 
+    X_train, X_val, y_train, y_val = train_test_split(train_df, train_labels, test_size=TEST_SIZE, 
                                                       random_state=RANDOM_STATE)
 
     train_tokens = tinybert_tokenizer(tokenizer, X_train['review'], config.max_len)
     val_tokens = tinybert_tokenizer(tokenizer, X_val['review'], config.max_len)
-    test_tokens = tinybert_tokenizer(tokenizer, test_texts['review'], config.max_len)
+    test_tokens = tinybert_tokenizer(tokenizer, test_df['review'], config.max_len)
 
     train_dataset = TensorDataset(train_tokens['input_ids'], train_tokens['attention_mask'], 
                                     torch.tensor(y_train.tolist()))
     val_dataset = TensorDataset(val_tokens['input_ids'], val_tokens['attention_mask'], 
                                 torch.tensor(y_val.tolist()))
     test_dataset = TensorDataset(test_tokens['input_ids'], test_tokens['attention_mask'], 
-                                    torch.tensor(test_texts['label'].tolist()))
+                                    torch.tensor(test_df['label'].tolist()))
 
     train_loader = DataLoader(train_dataset, batch_size=config.batch_size)
     val_loader = DataLoader(val_dataset, batch_size=config.batch_size)
@@ -76,8 +80,10 @@ def prepare_data_tinybert(train_texts, train_labels, test_texts, config):
 
     return train_loader, val_loader, test_loader
 
-def prepare_data_lstm(train_texts, test_texts, w2v_model, max_len):
+def prepare_data_lstm(train_texts, test_texts, max_len, w2v_config):
     '''Accept lemmas since LSTM works better with it.'''
+    w2v_model = Word2Vec(sentences=train_texts, vector_size=w2v_config.vector_size, 
+                         window=w2v_config.window, min_count=w2v_config.min_count, workers=w2v_config.workers)
     tokenizer = Tokenizer()
     tokenizer.fit_on_texts(train_texts)
     train_sequences = tokenizer.texts_to_sequences(train_texts)

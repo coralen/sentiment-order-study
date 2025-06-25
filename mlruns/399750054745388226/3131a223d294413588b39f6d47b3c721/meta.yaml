@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/Projects/sentiment-lstm-vs-transformer/mlruns/399750054745388226/3131a223d294413588b39f6d47b3c721/artifacts
+end_time: 1750785592621
+entry_point_name: ''
+experiment_id: '399750054745388226'
+lifecycle_stage: active
+run_id: 3131a223d294413588b39f6d47b3c721
+run_name: LSTM_sentiment_shuffled
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1750784859462
+status: 3
+tags: []
+user_id: Coral Engel

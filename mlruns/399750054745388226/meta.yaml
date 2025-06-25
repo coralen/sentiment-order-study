@@ -1,0 +1,7 @@
+artifact_location: file:///C:/Projects/sentiment-lstm-vs-transformer/mlruns/399750054745388226
+creation_time: 1750784179528
+experiment_id: '399750054745388226'
+last_update_time: 1750843314041
+lifecycle_stage: active
+name: LSTM_sentiment_experiment
+tags: {}

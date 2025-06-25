@@ -49,6 +49,6 @@ def write_stats_to_log(stats_dict, log_path):
     with open(log_path, "a") as f:
         f.write(json.dumps(stats_dict) + "\n")
 
-def log_stats(data, log_path):
+def collect_stats(data, log_path):
     stats_dict = create_stats_dict(data)
     write_stats_to_log(stats_dict, log_path)

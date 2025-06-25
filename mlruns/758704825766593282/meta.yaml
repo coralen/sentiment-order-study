@@ -1,0 +1,7 @@
+artifact_location: file:///C:/Projects/sentiment-lstm-vs-transformer/mlruns/758704825766593282
+creation_time: 1750785611946
+experiment_id: '758704825766593282'
+last_update_time: 1750843306375
+lifecycle_stage: active
+name: TinyBERT_sentiment_experiment
+tags: {}
