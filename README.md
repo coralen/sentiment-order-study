@@ -145,4 +145,6 @@ Open http://localhost:5000 to browse the experiment logs.
 
 #### 5. Run the notebook on your own results (Optional)  
 *Note: The notebook will need some modifications if you wish to view you own run results.*  
-Run mlflow locally. Locate in the notebook the line `mlflow.set_tracking_uri('https://sentiment-order-lab.onrender.com/')`, and change the url to `https://127.0.0.1:5000/`
+
+First, you have to complete step 4 and run mlflow locally.
+then, in the notebook, locate the line `mlflow.set_tracking_uri('https://sentiment-order-lab.onrender.com/')`, and change the url to `https://127.0.0.1:5000/`
