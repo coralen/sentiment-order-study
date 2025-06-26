@@ -121,24 +121,30 @@ sentiment-lstm-vs-transformer/
  ```
 
 ## Getting Started
-1. Clone the Repo  
+#### 1. Clone the Repo  
 ```
 git clone https://github.com/coralen/sentiment-order-study.git
 cd sentiment-order-study
 ```
-2. Install Dependencies  
+#### 2. Install Dependencies  
 ```
 pip install -r requirements.txt
 ```
 
-3. Run Training
+#### 3. Run Training
 ```
 python main.py
 ```
 **Total Training Time:** ~6.5 hours (for all 4 training runs on a standard CPU)
 
-4. Launch MLflow UI Locally (Optional)
+if you wish to run a faster and lighter version, change the value of `DATA_PATH` in file `src/config.py` from medium.csv to small.csv. Total training time for the lighter version is about ~5 minutes.
+
+#### 4. Launch MLflow UI Locally (Optional)  
 ```
 mlflow ui --backend-store-uri ./mlruns  
-```
+```  
 Open http://localhost:5000 to browse the experiment logs.
+
+#### 5. Run the notebook on your own results (Optional)  
+*Note: The notebook will need some modifications if you wish to view you own run results.*  
+Run mlflow locally. Locate in the notebook the line `mlflow.set_tracking_uri('https://sentiment-order-lab.onrender.com/')`, and change the url to `https://127.0.0.1:5000/`
