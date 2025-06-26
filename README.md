@@ -4,8 +4,7 @@
 
 This research project explores the effect of training order on LSTM and Transformer models for sentiment analysis.
 
-**Explore the full experiment dashboard with MLflow**:
-🔗 [sentiment-order-lab.onrender.com](https://sentiment-order-lab.onrender.com)  
+**Explore the full experiment dashboard with MLflow**: [sentiment-order-lab.onrender.com](https://sentiment-order-lab.onrender.com)  
 *🛈 Note: This is a live Render app — if it’s asleep, give it ~1 minute to wake up.*
 
 ## 💡 Research Question
