@@ -1,3 +1,6 @@
+import os
+import shutil
+
 from config import EVAL_LOG_PATH, STATS_LOG_PATH, DATA_PATH, LSTMConfig, TinyBERTConfig, Word2VecConfig
 from models.lstm import LSTMClassifier
 from models.tinybert import TinyBERTClassifier
@@ -28,7 +31,27 @@ def handle_tinybert_model(TinyBERTConfig, train_df, test_df):
     tinybert_original.evaluate(test_loader, log_path=EVAL_LOG_PATH, run_id=bert_mlflow_original)
     tinybert_original.save()
 
+def clear_mlruns():
+    mlruns_path = os.path.abspath("mlruns/")
+    print(mlruns_path)
+    if os.path.exists(mlruns_path):
+        [shutil.rmtree(os.path.join(mlruns_path, d)) if os.path.isdir(os.path.join(mlruns_path, d)) 
+         else os.remove(os.path.join(mlruns_path, d)) for d in os.listdir(mlruns_path)]
+        print(f"Cleared contents of {mlruns_path}")
+    else:
+        print(f"No such directory: {mlruns_path}")
+
+def clean_project(paths):
+    # Clean log files
+    for path in paths:
+        with open(path, "w") as f:
+                f.write("")
+    # Clean mlruns files
+    clear_mlruns()
+
 def main():
+    clean_project([EVAL_LOG_PATH, STATS_LOG_PATH])
+    
     # Process text for tokens, lemmas and pos tags
     train_df, train_df_shuffled, test_df = preprocess.process(DATA_PATH)
     
