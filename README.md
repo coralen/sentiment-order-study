@@ -7,8 +7,6 @@ This research project explores the effect of training order on LSTM and Transfor
 **Explore the full experiment dashboard with MLflow**: [sentiment-order-lab.onrender.com](https://sentiment-order-lab.onrender.com)  
 *🛈 Note: This is a live Render app — if it’s asleep, give it ~1 minute to wake up.*
 
-
-
 ## 💡 Research Question
 > Can LSTM and Transformer-based models produce significantly different sentiment predictions when the training data sequence is altered?
 
