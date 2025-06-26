@@ -8,7 +8,7 @@ This research project explores the effect of training order on LSTM and Transfor
 🔗 [sentiment-order-lab.onrender.com](https://sentiment-order-lab.onrender.com)  
 *🛈 Note: This is a live Render app — if it’s asleep, give it ~1 minute to wake up.*
 
-## Research Question
+## 💡 Research Question
 > Can LSTM and Transformer-based models produce significantly different sentiment predictions when the training data sequence is altered?
 
 ## Overview
@@ -21,14 +21,14 @@ Both models are trained twice:
 The results are tracked using **MLflow**, with accuracy, F1 scores, and confusion matrices compared across both runs.
 
 ## Dataset
-We use the [IMDb Movie Review dataset](https://www.kaggle.com/datasets/lakshmi25npathi/imdb-dataset-of-50k-movie-reviews), containing 50,000 labeled reviews.
+I use the [IMDb Movie Review dataset](https://www.kaggle.com/datasets/lakshmi25npathi/imdb-dataset-of-50k-movie-reviews), containing 50,000 labeled reviews.
 - A subset of **20,000 reviews** was selected and split into **training**, **validation**, and **test** sets.
 - Binary sentiment labels: `positive` / `negative`.
 - Preprocessing:
   - For **LSTM**: Reviews are tokenized and lemmatized.
   - For **TinyBERT**: Raw text is passed directly into the tokenizer (no preprocessing).
 
-## Experiments
+## Model Performance
 | Model     | Order     | Accuracy | F1 Score |
 |-----------|-----------|----------|----------|
 | LSTM      | Original  | 80.6%    | 0.82     |
@@ -36,15 +36,22 @@ We use the [IMDb Movie Review dataset](https://www.kaggle.com/datasets/lakshmi25
 | TinyBERT  | Original  | 84.6%    | 0.83     |
 | TinyBERT  | Shuffled  | 85.0%    | 0.84     |
 
+
 ## Results Summary
 **LSTM** shows a significant performance drop when order is removed, while **TinyBERT** remains stable, showcasing robustness due to its attention-based architecture.
 
 > 📝 **Curious why LSTM performs worse on shuffled data while TinyBERT stays consistent?**  
 > Explore [`sentiment_research_report.ipynb`](notebooks/sentiment_research_report.ipynb) — a detailed, step-by-step research log that covers training progress, model choices, and in-depth analysis of how data order affects learning.  
 
-![Model Performance Comparison](image.png)
+![Model Performance Comparison](images/models_comparison.png)
 
-## Models
+## Learning Behavior During Training
+The chart below compares training accuracy across epochs for both models.  
+While **TinyBERT** follows a smooth and consistent learning curve regardless of input order, **LSTM** exhibits less stable behavior and diverging patterns — especially under shuffled conditions.
+
+![Training Accuracy Progression](images/train_accuracy_comparison.png)
+
+## Models Architecture
 **LSTM**
 * Embedding: Pre-trained Word2Vec (frozen)  
 * Input: Lemmatized tokens  
