@@ -1,11 +1,14 @@
 # Sentiment Order Study
-**A research project  exploring the effect of training order on LSTM and Transformer models for sentiment analysis.**
 
-To view experiment results in MLflow, go to: 
-https://sentiment-order-lab.onrender.com  
-*🛈 Note: Server may need ~1 min to start if inactive.*
+**Sequence learning models like LSTMs are often assumed to depend heavily on input order. But how much does this matter in practice, and can modern Transformers overcome this limitation?**
 
-## 🎯 Research Question
+This research project explores the effect of training order on LSTM and Transformer models for sentiment analysis.
+
+**Explore the full experiment dashboard with MLflow**:
+🔗 [sentiment-order-lab.onrender.com](https://sentiment-order-lab.onrender.com)  
+*🛈 Note: This is a live Render app — if it’s asleep, give it ~1 minute to wake up.*
+
+## Research Question
 > Can LSTM and Transformer-based models produce significantly different sentiment predictions when the training data sequence is altered?
 
 ## Overview
@@ -17,8 +20,13 @@ Both models are trained twice:
 
 The results are tracked using **MLflow**, with accuracy, F1 scores, and confusion matrices compared across both runs.
 
-**Dataset**: [IMDb Movie Reviews](https://ai.stanford.edu/~amaas/data/sentiment/)
-
+## Dataset
+We use the [IMDb Movie Review dataset](https://www.kaggle.com/datasets/lakshmi25npathi/imdb-dataset-of-50k-movie-reviews), containing 50,000 labeled reviews.
+- A subset of **20,000 reviews** was selected and split into **training**, **validation**, and **test** sets.
+- Binary sentiment labels: `positive` / `negative`.
+- Preprocessing:
+  - For **LSTM**: Reviews are tokenized and lemmatized.
+  - For **TinyBERT**: Raw text is passed directly into the tokenizer (no preprocessing).
 
 ## Experiments
 | Model     | Order     | Accuracy | F1 Score |
@@ -120,7 +128,6 @@ pip install -r requirements.txt
 python main.py
 ```
 **Total Training Time:** ~6.5 hours (for all 4 training runs on a standard CPU)
-
 
 4. Launch MLflow UI Locally (Optional)
 ```
