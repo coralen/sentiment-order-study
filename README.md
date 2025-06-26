@@ -131,7 +131,7 @@ pip install -r requirements.txt
 
 #### 3. Run Training
 ```
-python main.py
+python src/main.py
 ```
 **Total Training Time:** ~6.5 hours (for all 4 training runs on a standard CPU)
 
