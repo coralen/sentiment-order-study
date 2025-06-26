@@ -11,6 +11,8 @@ import torch
 import mlflow
 import json
 
+from config import TIMESTAMP_FORMAT
+
 
 class TinyBERTClassifier:
     def __init__(self, config):
@@ -101,10 +103,8 @@ class TinyBERTClassifier:
             mlflow.end_run()
 
         if log:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-
             results = {
-                "timestamp": timestamp,
+                "timestamp": datetime.now().strftime(TIMESTAMP_FORMAT),
                 "model_name": self.model_name,
                 "test_loss": avg_loss,
                 "test_accuracy": acc,

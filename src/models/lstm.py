@@ -99,10 +99,8 @@ class LSTMClassifier:
             mlflow.end_run()
         
         if log:
-            timestamp = datetime.now().strftime(TIMESTAMP_FORMAT)
-
             results = {
-                "timestamp": timestamp,
+                "timestamp": datetime.now().strftime(TIMESTAMP_FORMAT),
                 "model_name": self.model_name,
                 "test_loss": test_loss,
                 "test_accuracy": accuracy,

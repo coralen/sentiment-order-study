@@ -2,6 +2,8 @@ from datetime import datetime
 from collections import Counter
 import json
 
+from config import TIMESTAMP_FORMAT
+
 
 def calculate_word_counts(data):
     raw_word_count = sum(len(review.split()) for review in data['review'])
@@ -33,7 +35,7 @@ def calculate_length_buckets(data, bucket_size=100, max_bucket=1000):
     return {label: value for label, value in zip(bucket_labels, bucket_values)}
 
 def create_stats_dict(data):
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now().strftime(TIMESTAMP_FORMAT)
     word_counts = calculate_word_counts(data)
     pos_distribution = calculate_pos_distribution(data)
     length_buckets = calculate_length_buckets(data)
@@ -45,10 +47,10 @@ def create_stats_dict(data):
         "len_buckets": length_buckets
     }
 
-def write_stats_to_log(stats_dict, log_path):    
+def save_stats(stats_dict, log_path):    
     with open(log_path, "a") as f:
         f.write(json.dumps(stats_dict) + "\n")
 
 def collect_stats(data, log_path):
     stats_dict = create_stats_dict(data)
-    write_stats_to_log(stats_dict, log_path)
+    save_stats(stats_dict, log_path)

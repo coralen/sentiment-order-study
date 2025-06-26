@@ -57,6 +57,7 @@ def tinybert_tokenizer(tokenizer, df, max_len):
             max_length=max_len,
             return_tensors='pt'
         )
+
 def prepare_data_tinybert(train_df, train_labels, test_df, config):
     '''Accept raw data since TinyBERT works better with it.'''
     tokenizer = BertTokenizerFast.from_pretrained("huawei-noah/TinyBERT_General_4L_312D")
@@ -64,26 +65,24 @@ def prepare_data_tinybert(train_df, train_labels, test_df, config):
                                                       random_state=RANDOM_STATE)
 
     train_tokens = tinybert_tokenizer(tokenizer, X_train['review'], config.max_len)
-    val_tokens = tinybert_tokenizer(tokenizer, X_val['review'], config.max_len)
-    test_tokens = tinybert_tokenizer(tokenizer, test_df['review'], config.max_len)
-
     train_dataset = TensorDataset(train_tokens['input_ids'], train_tokens['attention_mask'], 
                                     torch.tensor(y_train.tolist()))
+    train_loader = DataLoader(train_dataset, batch_size=config.batch_size)
+    
+    val_tokens = tinybert_tokenizer(tokenizer, X_val['review'], config.max_len)
     val_dataset = TensorDataset(val_tokens['input_ids'], val_tokens['attention_mask'], 
                                 torch.tensor(y_val.tolist()))
+    val_loader = DataLoader(val_dataset, batch_size=config.batch_size)
+    
+    test_tokens = tinybert_tokenizer(tokenizer, test_df['review'], config.max_len)
     test_dataset = TensorDataset(test_tokens['input_ids'], test_tokens['attention_mask'], 
                                     torch.tensor(test_df['label'].tolist()))
-
-    train_loader = DataLoader(train_dataset, batch_size=config.batch_size)
-    val_loader = DataLoader(val_dataset, batch_size=config.batch_size)
     test_loader = DataLoader(test_dataset, batch_size=config.batch_size)
 
     return train_loader, val_loader, test_loader
 
 def prepare_data_lstm(train_texts, test_texts, max_len, w2v_config):
-    '''Accept lemmas since LSTM works better with it.'''
-    w2v_model = Word2Vec(sentences=train_texts, vector_size=w2v_config.vector_size, 
-                         window=w2v_config.window, min_count=w2v_config.min_count, workers=w2v_config.workers)
+    '''Accept lemmas since LSTM works better with it.''' 
     tokenizer = Tokenizer()
     tokenizer.fit_on_texts(train_texts)
     train_sequences = tokenizer.texts_to_sequences(train_texts)
@@ -92,6 +91,9 @@ def prepare_data_lstm(train_texts, test_texts, max_len, w2v_config):
     # Pad sequences
     train_padded = pad_sequences(train_sequences, maxlen=max_len, padding='post')
     test_padded = pad_sequences(test_sequences, maxlen=max_len, padding='post')
+
+    w2v_model = Word2Vec(sentences=train_texts, vector_size=w2v_config.vector_size, 
+                         window=w2v_config.window, min_count=w2v_config.min_count, workers=w2v_config.workers)
 
     # Create embedding matrix
     word_index = tokenizer.word_index
