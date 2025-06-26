@@ -1,4 +1,4 @@
-# Sentiment Order Study
+# Sentiment Order Study: LSTM vs. Transformer
 
 **Sequence learning models like LSTMs are often assumed to depend heavily on input order. But how much does this matter in practice, and can modern Transformers overcome this limitation?**
 
